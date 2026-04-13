@@ -18,3 +18,13 @@
 #include <ui_dealership>
 #include <ui_gametime>
 #include <ui_money-notification>
+
+// exp bar
+#include <ui_xp-bar>
+
+// notifications and alerts idk if this ui is too modern for samp but it looks cool so here we are
+#include <ui_notify> // For general notifications - middle right ui (green text)
+#include <ui_alert> // For alerts - top right ui (red text)
+
+// notifications that has an fade in and fade out effect, used for the cash change and subtitles and also the popups etc..
+#include <ui_gamefeed>

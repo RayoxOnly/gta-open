@@ -21,35 +21,94 @@
 
 # Running & Compiling
 
-### Compiling & Ensuring
     Running this gamemode might be a little tricky because we recently migrated to open.mp
     take note that you need compiler 3.10.11 to compile this gamemode (sampctl has 3.10.10).
     replace the compiler at sampctl's AppData with 3.10.11 which can be downloaded in open.mp's files and make the folder named `pawn` inside the `sampctl` folder to read only access so it won't be replaced with 3.10.10 again every time you compile.
 
-    Ensure dependencies using `sampctl ensure` and build it with `sampctl build`.
+## Step 1 — Compile the Gamemode
 
-### Required Plugins
-    All server plugins are declared in `pawn.json` and automatically downloaded by `sampctl ensure`.
-    No manual plugin installation is needed. The key plugins used are:
-    - **SA-MP MySQL** (`pBlueG/SA-MP-MySQL`) - Database connectivity
-    - **samp-bcrypt** (`Sreyas-Sreelal/samp-bcrypt`) - Password hashing (uses direct native API)
-    - **sscanf** (`maddinat0r/sscanf`) - String parsing
-    - **Streamer** (`samp-incognito/samp-streamer-plugin`) - Object streaming
-    - **Crashdetect** (`AmyrAhmady/samp-plugin-crashdetect`) - Crash diagnostics
+```bash
+sampctl ensure
+sampctl build
+```
 
-### Running
-    Before running this gamemode if you don't have the tables required the gamemode itself will create one for you just go to `gamemode -> core -> constants.inc` and change the value of `##define SETUP_TABLE` to true, once you have the tables you can set this to false again.
+If successful, the compiled `gamemodes/main.amx` will be created.
 
-    The gamemode uses a file to connect to databases create a file named `mysql.ini` in the main directory. The variables are as follows
+---
 
-    ```bash
-        hostname=
-        username=
-        pass= # delete when your database doesn't require a password
-        database=
-    ```
+## Step 2 — Set Up MySQL
 
-    After that you can now run the gamemode by running omp-server.exe
+### 2a. Create the database
+
+```sql
+CREATE DATABASE gtaopen;
+```
+
+### 2b. Import the table schemas
+
+The SQL table definitions are located in the `scriptfiles/` directory. Import them **in order** (the `players` table must be created first since other tables reference it):
+
+```bash
+mysql -u root -p gtaopen < scriptfiles/players.sql
+mysql -u root -p gtaopen < scriptfiles/player_stats.sql
+mysql -u root -p gtaopen < scriptfiles/player_bank.sql
+mysql -u root -p gtaopen < scriptfiles/player_items.sql
+mysql -u root -p gtaopen < scriptfiles/player_shots.sql
+mysql -u root -p gtaopen < scriptfiles/weapons.sql
+mysql -u root -p gtaopen < scriptfiles/vips.sql
+mysql -u root -p gtaopen < scriptfiles/jail.sql
+mysql -u root -p gtaopen < scriptfiles/armys.sql
+mysql -u root -p gtaopen < scriptfiles/admins.sql
+mysql -u root -p gtaopen < scriptfiles/bans.sql
+mysql -u root -p gtaopen < scriptfiles/houses.sql
+mysql -u root -p gtaopen < scriptfiles/gangs.sql
+mysql -u root -p gtaopen < scriptfiles/atms.sql
+```
+
+Alternatively, the gamemode can create all tables automatically. In `gamemodes/core/constants.inc`, set:
+
+```pawn
+#define SETUP_TABLE     (true)
+```
+
+Run the server once. After all tables are created, change it back to `false` and recompile:
+
+```pawn
+#define SETUP_TABLE     (false)
+```
+
+### 2c. Create the MySQL connection file
+
+Create a file named **`mysql.ini`** in the **project root directory** (next to `config.json`):
+
+```ini
+hostname=localhost
+username=root
+password=yourpassword
+database=gtaopen
+```
+
+> **Note:** If your MySQL server has no password, remove the `password=` line entirely. This file is already in `.gitignore`.
+
+---
+
+## Step 3 — Run the Server
+
+**Windows:**
+```bash
+omp-server.exe
+```
+
+**Linux:**
+```bash
+chmod +x omp-server  # first time only
+./omp-server
+```
+
+The server starts on **port 7777** (configurable in `config.json`). Connect with a SA-MP or open.mp client to `localhost:7777`.
+
+---
+
 
 # How to contribute.
 

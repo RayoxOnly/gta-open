@@ -21,3 +21,8 @@
 #include <slot-machine_system>
 #include <lotto_system>
 #include <moneybag_system>
+#include <dumpster_diving>
+#include <ghosthunting_system>
+
+//side jobs
+#include <side-jobs>
